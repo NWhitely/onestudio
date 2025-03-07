@@ -115,7 +115,7 @@ function Profile() {
               <span className="text-red-600 font-bold">{errorMessage}</span>
             </div>
           )}
-          <h2 className="text-3xl">Welocme to Fiverr Clone</h2>
+          <h2 className="text-3xl">Welcome to OneStudio</h2>
           <h4 className="text-xl">
             Please complete your profile to get started
           </h4>
@@ -126,7 +126,7 @@ function Profile() {
               onMouseLeave={() => setImageHover(false)}
             >
               <label className={labelClassName} htmlFor="">
-                Select a profile Picture
+                Select a Profile Picture
               </label>
               <div className="bg-purple-500 h-36 w-36 flex items-center justify-center rounded-full relative">
                 {image ? (
@@ -175,7 +175,7 @@ function Profile() {
             <div className="flex gap-4 w-[500px]">
               <div>
                 <label className={labelClassName} htmlFor="userName">
-                  Please select a username
+                  Username
                 </label>
                 <input
                   className={inputClassName}
@@ -190,7 +190,7 @@ function Profile() {
 
               <div>
                 <label className={labelClassName} htmlFor="fullName">
-                  Please enter your full Name
+                  Full Name
                 </label>
                 <input
                   className={inputClassName}
@@ -205,7 +205,7 @@ function Profile() {
             </div>
             <div className="flex flex-col w-[500px]">
               <label className={labelClassName} htmlFor="description">
-                Description
+                Short Bio
               </label>
               <textarea
                 name="description"
@@ -213,7 +213,7 @@ function Profile() {
                 value={data.description}
                 onChange={handleChange}
                 className={inputClassName}
-                placeholder="description"
+                placeholder="Please enter what you would like your profile bio to be"
               ></textarea>
             </div>
             <button
