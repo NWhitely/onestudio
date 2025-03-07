@@ -11,7 +11,7 @@ import { dashboardRoutes } from "./routes/DashboardRoutes.js";
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || 8747; //Use 3000 if PORT is not set
 
 app.use(
   cors({
@@ -24,6 +24,7 @@ app.use(
 app.use("/uploads", express.static("uploads"));
 app.use("/uploads/profiles", express.static("uploads/profiles"));
 
+//Middleware 
 app.use(cookieParser());
 app.use(express.json());
 
