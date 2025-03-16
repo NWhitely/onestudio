@@ -10,7 +10,20 @@ import { GET_USER_INFO, HOST } from "../utils/constants";
 import ContextMenu from "./ContextMenu";
 import { useStateProvider } from "../context/StateContext";
 import { reducerCases } from "../context/constants";
+import jwtDecode from "jwt-decode"
 
+
+//const Token Expired 3.11.25
+    const isTokenExpired = (token) => {
+      try {
+        const decoded = jwtDecode(token);
+        return decoded.exp * 1000 < Date.now(); // Check expiration in milliseconds
+      } catch (err) {
+        return true; // If decoding fails, treat token as expired
+      }
+    };
+
+//Navbar Coding
 function Navbar() {
   const [cookies] = useCookies();
   const router = useRouter();
@@ -86,6 +99,13 @@ function Navbar() {
     if (cookies.jwt && !userInfo) {
       const getUserInfo = async () => {
         try {
+          if (!cookies.jwt) {
+            console.warn("No JWT token found, redirecting to login...");
+            router.push("/login");
+            return;
+          }
+      
+          console.log("JWT Token:", cookies.jwt); // Debugging
           const {
             data: { user },
           } = await axios.post(
@@ -98,7 +118,7 @@ function Navbar() {
               },
             }
           );
-
+      
           let projectedUserInfo = { ...user };
           if (user.image) {
             projectedUserInfo = {
@@ -112,14 +132,17 @@ function Navbar() {
             userInfo: projectedUserInfo,
           });
           setIsLoaded(true);
-          console.log({ user });
-          if (user.isProfileSet === false) {
-            router.push("/profile");
-          }
         } catch (err) {
-          console.log(err);
+          console.error("Error fetching user info:", err);
+      
+          if (err.response && err.response.status === 403) {
+            console.warn("JWT token is invalid or expired. Logging out...");
+            removeCookies("jwt"); // Clear bad token
+            router.push("/login"); // Redirect to login
+          }
         }
       };
+      
 
       getUserInfo();
     } else {
@@ -295,6 +318,14 @@ function Navbar() {
       )}
     </>
   );
+
+
+//Modifying how you store and handle cookies 3.11.25
+  if (!cookies.jwt || isTokenExpired(cookies.jwt)) {
+    removeCookies("jwt");
+    router.push("/login");
+  }
+
 }
 
 export default Navbar;

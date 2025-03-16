@@ -8,7 +8,8 @@
     "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\""
   },
   "dependencies": {
+    "concurrently": "^9.1.2",
     "if-env": "^1.0.4",
-    "concurrently": "^9.1.2"
+    "jwt-decode": "^4.0.0"
   }
 }
