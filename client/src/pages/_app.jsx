@@ -26,8 +26,8 @@ export default function App({ Component, pageProps }) {
   return (
     <StateProvider initialState={initialState} reducer={reducer}>
       <Head>
-        <link rel="shortcut icon" href="/favicon.ico" />
-        <title>Fiverr Clone</title>
+        <link rel="shortcut icon" href="/titlelogo.png" />
+        <title>One Studio</title>
       </Head>
       <div className="relative flex flex-col h-screen justify-between">
         <Navbar />

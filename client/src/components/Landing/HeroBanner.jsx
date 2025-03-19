@@ -11,7 +11,7 @@ function HomeBanner() {
   useEffect(() => {
     const interval = setInterval(() => {
       setImage((prevImage) => (prevImage % 6) + 1);
-    }, 3000);
+    }, 10000);
     return () => clearInterval(interval);
   }, []);
 
@@ -28,16 +28,22 @@ function HomeBanner() {
               fill
               className={`${
                 image === num ? "opacity-100" : "opacity-0"
-              } transition-all duration-1000 absolute top-0 left-0`}
+              } transition-all duration-[5000ms] absolute top-0 left-0`}
             />
           ))}
         </div>
-        <div className="z-10 relative w-[650px] flex justify-center flex-col h-full gap-5 ml-20">
+        <div
+          className={[
+            "z-10 relative",
+            "w-[650px] flex justify-center flex-col",
+            "h-full gap-5 ml-20",
+          ].join(" ")}
+        >
           <h1 className="text-white text-5xl leading-snug">
             Find the perfect&nbsp;
-            <i>freelance</i>
+            <i>instructor</i>
             <br />
-            services for your business
+            for your craft
           </h1>
           <div className="flex align-middle">
             <div className="relative">
