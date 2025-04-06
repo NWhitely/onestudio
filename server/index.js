@@ -34,6 +34,19 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 
+// Signal handling for graceful shutdown
+const handleShutdown = (signal) => {
+  console.log(`${signal} signal received. Shutting down server...`);
+  // Perform cleanup tasks here (e.g., close database connections)
+  process.exit(0); // Exit with a success code
+};
+
+process.on("SIGINT", () => handleShutdown("SIGINT")); // Handles Ctrl+C
+process.on("SIGHUP", () => handleShutdown("SIGHUP")); // Handles terminal hangup
+process.on("SIGTERM", () => handleShutdown("SIGTERM")); // Handles termination signals
+
+console.log("Signal handlers registered.");
+
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
 });
