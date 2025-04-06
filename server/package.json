@@ -1,5 +1,5 @@
 {
-  "name": "fiverr-clone",
+  "name": "onestudio",
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
@@ -24,6 +24,6 @@
     "dev": "nodemon index.js"
   },
   "author": "",
-  "license": "ISC",
+  "license": "UNLICENSED",
   "description": ""
 }
