@@ -1,15 +1,16 @@
 {
-  "name": "fiverr-clone",
-  "version": "1.0.0",
+  "name": "onestudio",
+  "version": "1.0.1",
   "scripts": {
     "build": "if-env TYPE=server && (cd server && npm install && npx prisma db push) || (cd client && npm install)",
     "server": "cd server && npm start",
     "client": "cd client && npm start",
-    "dev": "concurrently \"cd server && npm run dev\" \"cd client && npm run dev\""
+    "dev": "concurrently --raw --kill-others \"cd server && npm run dev\" \"cd client && npm run dev\""
   },
   "dependencies": {
     "concurrently": "^9.1.2",
     "if-env": "^1.0.4",
     "jwt-decode": "^4.0.0"
-  }
+  },
+  "license": "UNLICENSED"
 }

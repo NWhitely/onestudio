@@ -83,6 +83,15 @@ function AuthWrapper({ type }) {
           className="fixed z-[101] h-max w-max bg-white flex flex-col justify-center items-center"
           id="auth-modal"
         >
+          {/* Close button */}
+          <button
+            className="absolute top-2 right-2 text-xl font-bold text-gray-500 hover:text-gray-700"
+            onClick={() => {
+              dispatch({ type: reducerCases.CLOSE_AUTH_MODAL });
+            }}
+          >
+            X
+          </button>
           <div className="flex flex-col justify-center items-center p-8 gap-7">
             <h3 className="text-2xl font-semibold text-slate-700">
               {type === "login" ? "Login " : "Sign "}

@@ -38,7 +38,11 @@ app.use("/api/dashboard", dashboardRoutes);
 const handleShutdown = (signal) => {
   console.log(`${signal} signal received. Shutting down server...`);
   // Perform cleanup tasks here (e.g., close database connections)
-  process.exit(0); // Exit with a success code
+
+  // Delay the process exit slightly to ensure the message is logged last
+  setTimeout(() => {
+    process.exit(0); // Exit with a success code
+  }, 800); // 800ms delay
 };
 
 process.on("SIGINT", () => handleShutdown("SIGINT")); // Handles Ctrl+C
