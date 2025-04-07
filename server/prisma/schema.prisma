@@ -89,15 +89,10 @@ model Booking {
   id Int @id @default(autoincrement())
   user User @relation(fields: [userId], references: [id])
   userId Int
-  title String 
-  description String
-  price Float
-  availableSlots Int
+  calendlyEventId String
+  startTime DateTime
+  endTime DateTime
+  status String @default("pending")
   createdAt DateTime @default(now())
-  buyer User @relation("BookingBuyer", fields: [buyerId], references: [id])
-  buyerId Int
-  isConfirmed Boolean @default(false)
-  paymentIntent String @unique
-  gig Gigs @relation(fields: [gigId], references: [id])
-  gigId Int
+  updatedAt DateTime @updatedAt
 }
