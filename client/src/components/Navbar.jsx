@@ -10,18 +10,17 @@ import { GET_USER_INFO, HOST } from "../utils/constants";
 import ContextMenu from "./ContextMenu";
 import { useStateProvider } from "../context/StateContext";
 import { reducerCases } from "../context/constants";
-import jwtDecode from "jwt-decode"
-
+import jwtDecode from "jwt-decode";
 
 //const Token Expired 3.11.25
-    const isTokenExpired = (token) => {
-      try {
-        const decoded = jwtDecode(token);
-        return decoded.exp * 1000 < Date.now(); // Check expiration in milliseconds
-      } catch (err) {
-        return true; // If decoding fails, treat token as expired
-      }
-    };
+const isTokenExpired = (token) => {
+  try {
+    const decoded = jwtDecode(token);
+    return decoded.exp * 1000 < Date.now(); // Check expiration in milliseconds
+  } catch (err) {
+    return true; // If decoding fails, treat token as expired
+  }
+};
 
 //Navbar Coding
 function Navbar() {
@@ -60,10 +59,10 @@ function Navbar() {
   };
 
   const links = [
-    { linkName: "Fiverr Business", handler: "#", type: "link" },
+    { linkName: "Meet the Team", handler: "#", type: "link" },
     { linkName: "Explore", handler: "#", type: "link" },
     { linkName: "English", handler: "#", type: "link" },
-    { linkName: "Become a Seller", handler: "#", type: "link" },
+    { linkName: "Become an Instructor", handler: "#", type: "link" },
     { linkName: "Sign in", handler: handleLogin, type: "button" },
     { linkName: "Join", handler: handleSignup, type: "button2" },
   ];
@@ -104,7 +103,7 @@ function Navbar() {
             router.push("/login");
             return;
           }
-      
+
           console.log("JWT Token:", cookies.jwt); // Debugging
           const {
             data: { user },
@@ -118,7 +117,7 @@ function Navbar() {
               },
             }
           );
-      
+
           let projectedUserInfo = { ...user };
           if (user.image) {
             projectedUserInfo = {
@@ -134,7 +133,7 @@ function Navbar() {
           setIsLoaded(true);
         } catch (err) {
           console.error("Error fetching user info:", err);
-      
+
           if (err.response && err.response.status === 403) {
             console.warn("JWT token is invalid or expired. Logging out...");
             removeCookies("jwt"); // Clear bad token
@@ -142,7 +141,6 @@ function Navbar() {
           }
         }
       };
-      
 
       getUserInfo();
     } else {
@@ -188,7 +186,7 @@ function Navbar() {
     <>
       {isLoaded && (
         <nav
-          className={`w-full px-24 flex justify-between items-center py-6  top-0 z-30 transition-all duration-300 ${
+          className={`w-full px-24 flex justify-between items-center py-4 top-0 z-30 transition-all duration-300 ${
             navFixed || userInfo
               ? "fixed bg-white border-b border-gray-200"
               : "absolute bg-transparent border-transparent"
@@ -196,9 +194,12 @@ function Navbar() {
         >
           <div>
             <Link href="/">
-              <FiverrLogo
-                fillColor={!navFixed && !userInfo ? "#ffffff" : "#404145"}
-              />
+              <div className="h-[80px] w-[80px] overflow-hidden">
+                <FiverrLogo
+                  fillColor={!navFixed && !userInfo ? "#ffffff" : "#404145"}
+                  className="h-full w-full"
+                />
+              </div>
             </Link>
           </div>
           <div
@@ -208,13 +209,13 @@ function Navbar() {
           >
             <input
               type="text"
-              placeholder="What service are you looking for today?"
-              className="w-[30rem] py-2.5 px-4 border"
+              placeholder="What are you hoping to learn today?"
+              className="w-[30rem] py-1 px-4 border h-8"
               value={searchData}
               onChange={(e) => setSearchData(e.target.value)}
             />
             <button
-              className="bg-gray-900 py-1.5 text-white w-16 flex justify-center items-center"
+              className="bg-gray-900 py-1 text-white w-16 flex justify-center items-center"
               onClick={() => {
                 setSearchData("");
                 router.push(`/search?q=${searchData}`);
@@ -319,13 +320,11 @@ function Navbar() {
     </>
   );
 
-
-//Modifying how you store and handle cookies 3.11.25
+  //Modifying how you store and handle cookies 3.11.25
   if (!cookies.jwt || isTokenExpired(cookies.jwt)) {
     removeCookies("jwt");
     router.push("/login");
   }
-
 }
 
 export default Navbar;
