@@ -3,11 +3,15 @@
 ## Introduction
 OneStudio is a platform that connects instructors with clients for booking lessons. The MVP aims to provide a functional system for user management, calendar management, booking, payment integration, and notifications.
 
+> **Placeholder:** Add a short summary of the vision and goals of the platform. Why does it exist? What problem does it solve?
+
+---
+
 ## Features
 1. **User Management**
    - User Registration
    - User Login
-   - Profile Management
+   - Profile Management (e.g., username, bio, profile picture)
 
 2. **Calendar Management**
    - Instructors can create and manage their availability.
@@ -15,51 +19,111 @@ OneStudio is a platform that connects instructors with clients for booking lesso
 
 3. **Booking System**
    - Clients can book available time slots.
-   - Instructors can confirm bookings.
+   - Instructors can view and manage bookings.
 
 4. **Payment Integration**
-   - Process payments for bookings using Stripe.
+   - Process payments for bookings using Stripe (or another payment gateway).
 
 5. **Notifications**
-   - Send email notifications for bookings and cancellations.
+   - Send email and/or SMS notifications for bookings, cancellations, and reminders.
+
+---
+
+## Non-Functional Requirements
+1. **Performance:**
+   - The system should support up to 1,000 concurrent users during peak hours.
+   - Responses from the API should have a latency of less than 200ms.
+
+2. **Scalability:**
+   - The architecture should allow for easy scaling to support thousands of users globally.
+
+3. **Security:**
+   - Encrypt all sensitive data in transit using HTTPS.
+   - Store passwords securely using bcrypt hashing.
+
+4. **Reliability:**
+   - The system should have 99.9% uptime.
+
+---
+
+## User Roles and Permissions
+1. **Roles:**
+   - **Instructor:** Can create gigs, manage bookings, and view reviews.
+   - **Client:** Can book gigs, leave reviews, and message instructors.
+   - **Admin:** Can manage all users, gigs, and bookings.
+
+2. **Permissions:**
+   - Instructors can only access and modify their own gigs and bookings.
+   - Clients can only access their bookings and reviews.
+   - Admins have full access to all data.
+
+---
 
 ## User Stories
-1. **As a user, I want to register for an account so that I can use the platform.**
-2. **As an instructor, I want to create and manage my availability so that clients can book lessons with me.**
-3. **As a client, I want to view available time slots and book a lesson with an instructor.**
-4. **As a client, I want to make a payment for a booking using my credit card.**
-5. **As a user, I want to receive email notifications for bookings and cancellations.**
+1. **User Management:**
+   - As a user, I want to register for an account so that I can use the platform.
+   - As an instructor, I want to manage my profile so that clients can see my qualifications.
+
+2. **Calendar Management:**
+   - As an instructor, I want to set my availability so that clients can book lessons with me.
+   - As a client, I want to view available time slots so that I can book a lesson.
+
+3. **Booking System:**
+   - As a client, I want to book a lesson so that I can learn from an instructor.
+   - As an instructor, I want to manage my bookings so that I can stay organized.
+
+4. **Payment Integration:**
+   - As a client, I want to pay securely for a lesson so that I can confirm my booking.
+
+5. **Notifications:**
+   - As a user, I want to receive reminders about my upcoming bookings so that I don’t miss them.
+
+---
 
 ## API Endpoints
 1. **User Registration**
    - `POST /api/register`
-   - Registers a new user.
+   - **Request:**
+     ```json
+     {
+       "email": "user@example.com",
+       "password": "securepassword",
+       "username": "user123"
+     }
+     ```
+   - **Response:**
+     ```json
+     {
+       "id": 1,
+       "email": "user@example.com",
+       "username": "user123",
+       "token": "jwt-token"
+     }
+     ```
 
 2. **User Login**
    - `POST /api/login`
-   - Authenticates a user and returns a token.
 
 3. **Create/Update/Delete Availability**
    - `POST /api/availability`
    - `PUT /api/availability/:id`
    - `DELETE /api/availability/:id`
-   - Manages instructor availability.
 
 4. **View Available Time Slots**
    - `GET /api/availability`
-   - Returns a list of available time slots.
 
 5. **Book Appointment**
    - `POST /api/bookings`
-   - Books a time slot.
 
 6. **Payment Processing**
    - `POST /api/payments`
-   - Processes payments using Stripe.
 
 7. **Send Notifications**
    - `POST /api/notifications`
-   - Sends email notifications.
+
+> **Placeholder:** Flesh out the request and response formats for all endpoints.
+
+---
 
 ## Database Schema
 1. **User**
@@ -77,6 +141,10 @@ OneStudio is a platform that connects instructors with clients for booking lesso
 5. **Message**
    - `id`, `text`, `createdAt`, `isRead`, `senderId`, `recipientId`, `orderId`
 
+> **Placeholder:** Confirm if additional models (like Admin) or fields are needed.
+
+---
+
 ## Technologies and Tools
 - **Backend:** Node.js, Express, Prisma
 - **Frontend:** React.js
@@ -84,6 +152,54 @@ OneStudio is a platform that connects instructors with clients for booking lesso
 - **Payment Integration:** Stripe
 - **Notifications:** SendGrid or Twilio
 - **Deployment:** AWS or Heroku
+
+> **Placeholder:** Add any other tools or technologies you plan to use.
+
+---
+
+## Testing Requirements
+1. **Unit Testing:**
+   - Backend logic and API endpoints.
+
+2. **Integration Testing:**
+   - Test interactions between the database and API.
+
+3. **User Acceptance Testing (UAT):**
+   - Ensure the platform meets user expectations.
+
+---
+
+## Deployment Plan
+1. **Hosting:** AWS or Heroku.
+2. **CI/CD Pipelines:** Use GitHub Actions for testing and deployment.
+
+> **Placeholder:** Add details about staging environments, database backups, etc.
+
+---
+
+## Monitoring and Maintenance
+1. **Monitoring:**
+   - Use New Relic or Datadog to monitor performance.
+   - Use Sentry for error tracking.
+
+2. **Maintenance:**
+   - Schedule regular updates and backups.
+
+---
+
+## Future Features (Post-MVP)
+1. Advanced analytics for instructors.
+2. Mobile app support.
+3. Multi-language support.
+
+> **Placeholder:** List any other features you plan to add after the MVP launch.
+
+---
+
+## Revenue Model
+> **Placeholder:** Add details about how the platform will generate revenue (e.g., subscription fees, booking fees).
+
+---
 
 ## Timeline
 1. **Week 1-2:** User Management
@@ -93,3 +209,5 @@ OneStudio is a platform that connects instructors with clients for booking lesso
 5. **Week 8:** Notifications
 6. **Week 9:** Testing and Bug Fixes
 7. **Week 10:** Deployment and Launch
+
+> **Placeholder:** Adjust the timeline based on your development speed and team size.
