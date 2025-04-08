@@ -2,6 +2,13 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import { genSalt, hash, compare } from "bcrypt";
 import jwt from "jsonwebtoken";
 import { renameSync } from "fs";
+import { OAuth2Client } from "google-auth-library";
+
+const oauth2Client = new OAuth2Client(
+  process.env.GOOGLE_CLIENT_ID,
+  process.env.GOOGLE_CLIENT_SECRET,
+  process.env.GOOGLE_REDIRECT_URI
+);
 
 const generatePassword = async (password) => {
   const salt = await genSalt();
@@ -165,5 +172,30 @@ export const setUserImage = async (req, res, next) => {
   } catch (err) {
     console.log(err);
     res.status(500).send("Internal Server Occured");
+  }
+};
+
+// Generate Google OAuth login URL
+export const googleLogin = (req, res) => {
+  const authUrl = oauth2Client.generateAuthUrl({
+    access_type: "offline",
+    scope: ["https://www.googleapis.com/auth/calendar"],
+  });
+  res.json({ url: authUrl });
+};
+
+// Handle Google OAuth callback
+export const googleCallback = async (req, res) => {
+  const { code } = req.query;
+
+  try {
+    const { tokens } = await oauth2Client.getToken(code);
+    oauth2Client.setCredentials(tokens);
+
+    // Save tokens to the database or session (e.g., tokens.access_token, tokens.refresh_token)
+    res.json({ message: "Authentication successful", tokens });
+  } catch (error) {
+    console.error("Error during Google OAuth callback:", error);
+    res.status(500).json({ error: "Failed to authenticate with Google" });
   }
 };

@@ -22,9 +22,20 @@ const isTokenExpired = (token) => {
   }
 };
 
+const refreshAccessToken = async () => {
+  try {
+    const response = await axios.post("/api/auth/refresh-token", {}, { withCredentials: true });
+    const { accessToken } = response.data;
+    setCookie("jwt", accessToken); // Update the access token in cookies
+  } catch (error) {
+    console.error("Failed to refresh access token:", error);
+    router.push("/login"); // Redirect to login if refresh fails
+  }
+};
+
 //Navbar Coding
 function Navbar() {
-  const [cookies] = useCookies();
+  const [cookies, setCookie, removeCookies] = useCookies();
   const router = useRouter();
   const [navFixed, setNavFixed] = useState(false);
   const [searchData, setSearchData] = useState("");
@@ -56,6 +67,16 @@ function Navbar() {
       type: reducerCases.TOGGLE_SIGNUP_MODAL,
       showSignupModal: true,
     });
+  };
+
+  const handleLogout = async () => {
+    try {
+      await axios.post("/api/auth/logout", {}, { withCredentials: true });
+      removeCookies("jwt"); // Clear the access token
+      router.push("/login");
+    } catch (error) {
+      console.error("Failed to log out:", error);
+    }
   };
 
   const links = [
@@ -147,6 +168,25 @@ function Navbar() {
       setIsLoaded(true);
     }
   }, [cookies, userInfo, dispatch]);
+
+  useEffect(() => {
+    if (cookies.jwt) {
+      const decoded = jwtDecode(cookies.jwt);
+      const timeUntilExpiry = decoded.exp * 1000 - Date.now();
+
+      if (timeUntilExpiry > 0) {
+        const timeout = setTimeout(() => {
+          refreshAccessToken(); // Refresh the token before it expires
+        }, timeUntilExpiry - 60000); // Refresh 1 minute before expiry
+
+        return () => clearTimeout(timeout); // Cleanup on unmount
+      } else {
+        removeCookies("jwt");
+        router.push("/login");
+      }
+    }
+  }, [cookies.jwt, router]);
+
   const [isContextMenuVisible, setIsContextMenuVisible] = useState(false);
   useEffect(() => {
     const clickListener = (e) => {
@@ -177,7 +217,7 @@ function Navbar() {
         e.stopPropagation();
 
         setIsContextMenuVisible(false);
-        router.push("/logout");
+        handleLogout();
       },
     },
   ];
