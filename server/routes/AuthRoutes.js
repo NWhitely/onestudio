@@ -11,6 +11,9 @@ import {
 import { verifyToken } from "../middlewares/AuthMiddleware.js";
 import multer from "multer";
 import jwt from "jsonwebtoken";
+import { getTokens, refreshAccessToken } from "./googleAuth.js";
+import { prisma } from "../prisma/client.js";
+import axios from "axios";
 
 const authRoutes = Router();
 const upload = multer({ dest: "uploads/profiles/" });
@@ -82,6 +85,74 @@ authRoutes.get("/google/login", (req, res) => {
   res.json({ url: authUrl });
 });
 
-authRoutes.get("/google/callback", googleCallback);
+authRoutes.get("/google/callback", async (req, res) => {
+  const { code } = req.query;
+
+  try {
+    // Exchange the authorization code for tokens
+    const tokens = await getTokens(code);
+
+    // Save tokens to the database
+    const userId = 1; // Replace with logic to identify the logged-in user
+    await prisma.userTokens.upsert({
+      where: { userId },
+      update: {
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+        expiryDate: tokens.expiry_date,
+      },
+      create: {
+        userId,
+        accessToken: tokens.access_token,
+        refreshToken: tokens.refresh_token,
+        expiryDate: tokens.expiry_date,
+      },
+    });
+
+    res.json({ message: "Authentication successful", tokens });
+  } catch (error) {
+    console.error("Error during Google OAuth callback:", error);
+    res.status(500).json({ error: "Failed to authenticate with Google" });
+  }
+});
+
+authRoutes.get("/google/calendar/events", async (req, res) => {
+  try {
+    const userId = 1; // Replace with logic to identify the logged-in user
+    const userTokens = await prisma.userTokens.findUnique({ where: { userId } });
+
+    if (!userTokens) {
+      return res.status(404).json({ error: "No tokens found for the user" });
+    }
+
+    // Check if the access token has expired
+    if (Date.now() > userTokens.expiryDate) {
+      console.log("Access token expired. Refreshing...");
+      const newTokens = await refreshAccessToken(userTokens.refreshToken);
+
+      // Update the database with the new tokens
+      await prisma.userTokens.update({
+        where: { userId },
+        data: {
+          accessToken: newTokens.access_token,
+          expiryDate: newTokens.expiry_date,
+        },
+      });
+
+      userTokens.accessToken = newTokens.access_token; // Use the new access token
+    }
+
+    const response = await axios.get("https://www.googleapis.com/calendar/v3/calendars/primary/events", {
+      headers: {
+        Authorization: `Bearer ${userTokens.accessToken}`,
+      },
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    console.error("Error fetching calendar events:", error);
+    res.status(500).json({ error: "Failed to fetch calendar events" });
+  }
+});
 
 export default authRoutes;
