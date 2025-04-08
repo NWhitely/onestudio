@@ -83,3 +83,13 @@ model Message {
   order Orders @relation(fields: [orderId], references: [id])
   orderId Int
 }
+
+// This model is used to store user tokens for authentication and authorization
+// It includes fields for the user ID, access token, refresh token, and expiry date
+// Added on April 7, 2025 - Working on Google API Login
+model UserTokens {
+  userId Int @id @default(autoincrement())
+  accessToken String
+  refreshToken String
+  expiryDate BigInt
+}

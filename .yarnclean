@@ -41,5 +41,3 @@ wercker.yml
 .yarn-metadata.json
 .travis.yml
 
-# misc
-*.md
