@@ -1,4 +1,4 @@
-import { OAuth2Client } from "google-auth-library";h-library";
+import { OAuth2Client } from "google-auth-library";
 
 const oauth2Client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID, // Your Google Client ID
@@ -22,4 +22,14 @@ const getTokens = async (code) => {
   return tokens;
 };
 
-export { oauth2Client, getAuthUrl, getTokens };
+const refreshAccessToken = async (refreshToken) => {
+  try {
+    const { tokens } = await oauth2Client.refreshToken(refreshToken);
+    return tokens;
+  } catch (error) {
+    console.error("Error refreshing access token:", error);
+    throw error;
+  }
+};
+
+export { oauth2Client, getAuthUrl, getTokens, refreshAccessToken };

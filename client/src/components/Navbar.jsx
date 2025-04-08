@@ -222,6 +222,11 @@ function Navbar() {
     },
   ];
 
+  const connectGoogleCalendar = async () => {
+    const response = await axios.get("/api/auth/google/login");
+    window.location.href = response.data.url; // Redirect to Google login
+  };
+
   return (
     <>
       {isLoaded && (
@@ -351,6 +356,14 @@ function Navbar() {
                     </span>
                   </div>
                 )}
+              </li>
+              <li>
+                <button
+                  onClick={connectGoogleCalendar}
+                  className="border text-md font-semibold py-1 px-3 rounded-sm border-[#1DBF73] text-[#1DBF73] hover:bg-[#1DBF73] hover:text-white hover:border-[#1DBF73] transition-all duration-500"
+                >
+                  Connect Google Calendar
+                </button>
               </li>
             </ul>
           )}
