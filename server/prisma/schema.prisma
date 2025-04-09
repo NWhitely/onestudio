@@ -80,3 +80,28 @@ model Message {
   recipient   User     @relation("receivedMessages", fields: [recipientId], references: [id])
   sender      User     @relation("sentMessages", fields: [senderId], references: [id])
 }
+
+model InstructorAvailability {
+  id          Int       @id @default(autoincrement())
+  userId      Int       // Foreign key to User
+  dayOfWeek   Int       // 0 (Sunday) to 6 (Saturday)
+  startTime   String    // "09:00" format
+  endTime     String    // "17:00" format
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id])
+  timeSlots   TimeSlot[]
+}
+
+model TimeSlot {
+  id                 Int       @id @default(autoincrement())
+  instructorAvailabilityId Int // Foreign key to InstructorAvailability
+  startTime          DateTime
+  endTime            DateTime
+  price              Int
+  description        String?
+  isBooked           Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  availability       InstructorAvailability @relation(fields: [instructorAvailabilityId], references: [id])
+}
