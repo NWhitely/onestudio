@@ -12,10 +12,13 @@ import reducer, { initialState } from "../context/StateReducers";
 export default function App({ Component, pageProps }) {
   const router = useRouter();
   const [cookies] = useCookies();
+
   useEffect(() => {
+    // Redirect unauthenticated users from restricted routes
     if (
       router.pathname.includes("/seller") ||
-      router.pathname.includes("/buyer")
+      router.pathname.includes("/buyer") ||
+      router.pathname.includes("/profile")
     ) {
       if (!cookies.jwt) {
         router.push("/");
