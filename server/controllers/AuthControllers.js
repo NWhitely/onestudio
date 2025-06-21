@@ -3,12 +3,15 @@ import { genSalt, hash, compare } from "bcrypt";
 import jwt from "jsonwebtoken";
 import { renameSync } from "fs";
 import { OAuth2Client } from "google-auth-library";
+import { jwtDecode } from "jwt-decode";
 
 const oauth2Client = new OAuth2Client(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
   process.env.GOOGLE_REDIRECT_URI
 );
+
+const prisma = new PrismaClient(); // Initialize the prisma client
 
 const generatePassword = async (password) => {
   const salt = await genSalt();
@@ -23,40 +26,39 @@ const createToken = (email, userId) => {
   });
 };
 
-export const signup = async (req, res, next) => {
+export const signup = async (req, res) => {
   try {
-    const prisma = new PrismaClient();
     const { email, password } = req.body;
-    if (email && password) {
-      const user = await prisma.user.create({
-        data: {
-          email,
-          password: await generatePassword(password),
-        },
-      });
-      return res.status(201).json({
-        user: { id: user?.id, email: user?.email },
-        jwt: createToken(email, user.id),
-      });
-    } else {
-      return res.status(400).send("Email and Password Required");
+
+    // Check if the user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ error: "Email is already in use." });
     }
-  } catch (err) {
-    console.log(err);
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      if (err.code === "P2002") {
-        return res.status(400).send("Email Already Registered");
-      }
-    } else {
-      return res.status(500).send("Internal Server Error");
-    }
-    throw err;
+
+    // Hash the password
+    const hashedPassword = await hash(password, 10);
+
+    // Create the new user
+    const newUser = await prisma.user.create({
+      data: {
+        email,
+        password: hashedPassword,
+      },
+    });
+
+    return res.status(201).json({ message: "User created successfully.", user: newUser });
+  } catch (error) {
+    console.error("Error during signup:", error);
+    return res.status(500).json({ error: "Server error." });
   }
 };
 
 export const login = async (req, res, next) => {
   try {
-    const prisma = new PrismaClient();
     const { email, password } = req.body;
     if (email && password) {
       const user = await prisma.user.findUnique({
@@ -88,7 +90,6 @@ export const login = async (req, res, next) => {
 export const getUserInfo = async (req, res, next) => {
   try {
     if (req?.userId) {
-      const prisma = new PrismaClient();
       const user = await prisma.user.findUnique({
         where: {
           id: req.userId,
@@ -116,7 +117,6 @@ export const setUserInfo = async (req, res, next) => {
     if (req?.userId) {
       const { userName, fullName, description } = req.body;
       if (userName && fullName && description) {
-        const prisma = new PrismaClient();
         const userNameValid = await prisma.user.findUnique({
           where: { username: userName },
         });
@@ -158,8 +158,6 @@ export const setUserImage = async (req, res, next) => {
         const date = Date.now();
         let fileName = "uploads/profiles/" + date + req.file.originalname;
         renameSync(req.file.path, fileName);
-        const prisma = new PrismaClient();
-
         await prisma.user.update({
           where: { id: req.userId },
           data: { profileImage: fileName },

@@ -1,7 +1,6 @@
 import { Router } from "express";
 import {
   getUserInfo,
-  login,
   setUserImage,
   setUserInfo,
   signup,
@@ -12,41 +11,86 @@ import { verifyToken } from "../middlewares/AuthMiddleware.js";
 import multer from "multer";
 import jwt from "jsonwebtoken";
 import { getTokens, refreshAccessToken } from "./googleAuth.js";
-import { prisma } from "../prisma/client.js";
-import axios from "axios";
+import { PrismaClient } from "@prisma/client";
+import { compare } from "bcrypt";
+
+const prisma = new PrismaClient();
 
 const authRoutes = Router();
 const upload = multer({ dest: "uploads/profiles/" });
 
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    console.log("Login request received:", { email, password });
+
+    // Query the database for the user
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    console.log("User found in database:", user);
+
+    if (!user) {
+      return res.status(400).json({ error: "User not found or invalid." });
+    }
+
+    // Compare the provided password with the hashed password
+    const isPasswordValid = await compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json({ error: "Invalid password." });
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
+
+    return res.status(200).json({ token });
+  } catch (error) {
+    console.error("Error during login:", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+};
+
 authRoutes.post("/signup", signup);
-authRoutes.post("/login", (req, res) => {
-  login(req, res);
+authRoutes.post("/login", login);
+authRoutes.post("/get-user-info", verifyToken, (req, res) => {
+  if (someCondition) {
+    res.status(400).json({ error: "Invalid request." });
+    return; // Prevent further execution
+  }
 
-  const user = req.user; // Assuming `req.user` is set after login
-  const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "15m", // Short-lived access token
-  });
+  getUserInfo(req, res);
 
-  const refreshToken = jwt.sign({ userId: user._id }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: "7d", // Long-lived refresh token
-  });
-
-  // Send tokens to the client
-  res.cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-  });
-  res.json({ accessToken });
+  res.status(200).json({ message: "Success" });
 });
-authRoutes.post("/get-user-info", verifyToken, getUserInfo);
-authRoutes.post("/set-user-info", verifyToken, setUserInfo);
+authRoutes.post("/set-user-info", verifyToken, (req, res) => {
+  if (someCondition) {
+    res.status(400).json({ error: "Invalid request." });
+    return; // Prevent further execution
+  }
+
+  setUserInfo(req, res);
+
+  res.status(200).json({ message: "Success" });
+});
 
 authRoutes.post(
   "/set-user-image",
   verifyToken,
   upload.single("images"),
-  setUserImage
+  (req, res) => {
+    if (someCondition) {
+      res.status(400).json({ error: "Invalid request." });
+      return; // Prevent further execution
+    }
+
+    setUserImage(req, res);
+
+    res.status(200).json({ message: "Success" });
+  }
 );
 
 authRoutes.post("/refresh-token", (req, res) => {

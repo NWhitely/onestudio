@@ -7,12 +7,15 @@ import { gigRoutes } from "./routes/GigRoutes.js";
 import { orderRoutes } from "./routes/OrderRoutes.js";
 import { messageRoutes } from "./routes/MessageRoutes.js";
 import { dashboardRoutes } from "./routes/DashboardRoutes.js";
+import availabilityRoutes from "./routes/availabilityRoutes.js"; // Import availability routes
 import { OAuth2Client } from "google-auth-library"; // Import Google APIs
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 8747; // Use 3000 if PORT is not set
+
+console.log(`Starting server on port ${port}...`);
 
 // Google OAuth setup
 const oauth2Client = new OAuth2Client(
@@ -70,6 +73,7 @@ app.use("/api/gigs", gigRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/instructor-availability", availabilityRoutes); // Add availability routes
 
 // Signal handling for graceful shutdown
 const handleShutdown = (signal) => {
@@ -90,5 +94,5 @@ console.log("Signal handlers registered.");
 
 // Start the server
 app.listen(port, () => {
-  console.log(`[server]: Server is running at http://localhost:${port}`);
+  console.log(`Server is running on http://localhost:${port}`);
 });

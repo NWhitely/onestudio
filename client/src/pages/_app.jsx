@@ -8,17 +8,31 @@ import { useCookies } from "react-cookie";
 import { useEffect } from "react";
 import { StateProvider } from "../context/StateContext";
 import reducer, { initialState } from "../context/StateReducers";
+import jwtdecode from "jwt-decode";
+
+export const decodeToken = (token) => {
+  try {
+    return jwtdecode(token);
+  } catch (error) {
+    console.error("Failed to decode token:", error);
+    return null;
+  }
+};
 
 export default function App({ Component, pageProps }) {
   const router = useRouter();
   const [cookies] = useCookies();
   useEffect(() => {
+    console.log("JWT Cookie:", cookies.jwt); // Debug the JWT token
     if (
       router.pathname.includes("/seller") ||
       router.pathname.includes("/buyer")
     ) {
       if (!cookies.jwt) {
         router.push("/");
+      } else {
+        const decoded = decodeToken(cookies.jwt);
+        console.log("Decoded Token:", decoded); // Debug the decoded token
       }
     }
   }, [cookies, router]);

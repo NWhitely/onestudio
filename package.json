@@ -3,7 +3,7 @@
   "name": "onestudio",
   "version": "1.0.0",
   "scripts": {
-    "dev": "concurrently --raw --kill-others \"cd server && npm run dev\" \"cd client && npm run dev\"",
+    "dev": "concurrently --raw --kill-others-on-fail \"cd server && npm run dev\" \"cd client && npm run dev\"",
     "start": "node server/index.js",
     "prisma:generate": "npx prisma generate --schema=server/prisma/schema.prisma",
     "prisma:migrate": "npx prisma migrate dev --schema=server/prisma/schema.prisma"
@@ -23,5 +23,8 @@
   "devDependencies": {
     "nodemon": "^2.0.22"
   },
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "prisma": {
+    "schema": "server/prisma/schema.prisma"
+  }
 }
